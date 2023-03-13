@@ -14,5 +14,7 @@ int main() {
 }
 
 void Listener_MessageReceived(TcpListener* listener, int client, std::string msg) {
+	
+	listener->Send(client, msg);
 
 }

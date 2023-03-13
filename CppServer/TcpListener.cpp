@@ -23,11 +23,11 @@ bool TcpListener::Init() {
 	int wSock = WSAStartup(version, &wsData);
 
 	if (wSock != 0) {
-		std::cerr << "Failed to initialize socket" << std::endl;
+		std::cerr << "[Failed to initialize socket]" << std::endl;
 		return 1;
 	}
 	else {
-		std::cout << "Socket initialized" << std::endl;
+		std::cout << "[Socket initialized]" << std::endl;
 	}
 
 	return wSock == 0;
@@ -45,11 +45,15 @@ void TcpListener::Run() {
 			break;
 		}
 
-		SOCKET client = TcpListener::WaitForConnection(listener);
-		if (client != INVALID_SOCKET) {
-			closesocket(listener);
+		std::cout << "[Listener created]" << std::endl;
 
-			int bytesReceived{0};
+		SOCKET client = TcpListener::WaitForConnection(listener);
+
+		if (client != INVALID_SOCKET) {
+			std::cout << "[Connection established, closing listener]" << std::endl;
+			closesocket(listener);		
+
+			int bytesReceived = 0;
 
 			do {
 				memset(msgBuffer, 0, MAX_BUFFER_SIZE);
@@ -63,16 +67,18 @@ void TcpListener::Run() {
 				}
 
 			} while (bytesReceived > 0);
+			
+			closesocket(client);
 
 		}
 
-		//Wait for connection
-		//Loop receive / send
+		std::cout << "[Connection closed, creating listener]" << std::endl;
 	}
 }
 
 //Cleanup
 void TcpListener::CleanUp() {
+	std::cout << "[Cleanup]" << std::endl;
 	WSACleanup();
 }
 
@@ -81,11 +87,11 @@ SOCKET TcpListener::CreateSocket() {
 	SOCKET listener = socket(AF_INET, SOCK_STREAM, 0);
 
 	if (listener == INVALID_SOCKET) {
-		std::cerr << "Failed to create socket (invalid socket)" << std::endl;
+		std::cerr << "[Failed to create socket (invalid socket)]" << std::endl;
 		return 1;
 	}
 	else {
-		std::cout << "Socket created" << std::endl;
+		std::cout << "[Socket created]" << std::endl;
 
 		//Bind ip and port to socket
 		sockaddr_in hint;
@@ -99,47 +105,23 @@ SOCKET TcpListener::CreateSocket() {
 			//Set sock up for listening
 			int listenReturn = listen(listener, SOMAXCONN);
 			if (listenReturn == SOCKET_ERROR) {
+				std::cout << "[Error while binding listener]" << std::endl;
 				return -1;
 			}
 		}
 		else {
+			std::cout << "[Error while binding listener]" << std::endl;
 			return -1;
 		}
 	}
 
+	std::cout << "[Listener bound]" << std::endl;
 	return listener;
 }
 
 //Wait for connection
 SOCKET TcpListener::WaitForConnection(SOCKET listener) {
-	/*
-	sockaddr_in client;
-	int clientSize = sizeof(client);
-
-	SOCKET clientSocket = accept(listener, (sockaddr*)&client, &clientSize);
-
-	char host[NI_MAXHOST];			//Remote name of client
-	char service[NI_MAXHOST];		//Service (port) client is connected to
-
-	memset(host, 0, NI_MAXHOST);		//ZeroMemory is defined in winbase but memset is portable
-	memset(service, 0, NI_MAXSERV);
-
-	if (getnameinfo((sockaddr*)&client, clientSize, host, NI_MAXHOST, service, NI_MAXSERV, 0) == 0) {
-		std::cout << host << " connected to port " << service << std::endl;
-	}
-	else {
-		inet_ntop(AF_INET, &client.sin_addr, host, NI_MAXHOST);
-		std::cout << host << " connected to port " << ntohs(client.sin_port) << std::endl;
-	}
-
-	if (clientSocket == INVALID_SOCKET) {
-		std::cerr << "Invalid client socket" << std::endl;
-	}
-	else {
-		std::cout << "Client socket connected" << std::endl;
-	}
-	*/
-
+	std::cout << "Waiting for connection..." << std::endl;
 	SOCKET client = accept(listener, NULL, NULL);
 	return client;
 }

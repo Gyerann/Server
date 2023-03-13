@@ -1,2 +1,6 @@
-﻿  main.cpp
+﻿  TcpListener.cpp
+D:\Programming\C++\CppServer\CppServer\TcpListener.cpp(15,51): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+D:\Programming\C++\CppServer\CppServer\TcpListener.cpp(65,25): warning C4244: 'argument': conversion from 'SOCKET' to 'int', possible loss of data
+  main.cpp
+  Generating Code...
   CppServer.vcxproj -> D:\Programming\C++\CppServer\x64\Debug\CppServer.exe
